@@ -1,9 +1,11 @@
 import { Module } from '@nestjs/common';
 import { PrismaModule } from './prisma/prisma.module';
 import { UsersModule } from './users/users.module';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { HallsModule } from './halls/halls.module';
 import { TicketsModule } from './tickets/tickets.module';
+import { MongooseModule } from '@nestjs/mongoose';
+import { MoviesModule } from './movies/movies.module';
 
 @Module({
   imports: [
@@ -14,6 +16,14 @@ import { TicketsModule } from './tickets/tickets.module';
     }),
     HallsModule,
     TicketsModule,
+    MongooseModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
+        uri: configService.get<string>('MONGODB_URI'),
+      }),
+    }),
+    MoviesModule,
   ],
 })
 export class AppModule {}
