@@ -3,6 +3,7 @@ import { PrismaModule } from './prisma/prisma.module';
 import { UsersModule } from './users/users.module';
 import { ConfigModule } from '@nestjs/config';
 import { HallsModule } from './halls/halls.module';
+import { TicketsModule } from './tickets/tickets.module';
 
 @Module({
   imports: [
@@ -12,6 +13,7 @@ import { HallsModule } from './halls/halls.module';
       isGlobal: true,
     }),
     HallsModule,
+    TicketsModule,
   ],
 })
 export class AppModule {}
