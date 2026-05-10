@@ -7,6 +7,10 @@ import { TicketsModule } from './tickets/tickets.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { MoviesModule } from './movies/movies.module';
 import { CommentsModule } from './comments/comments.module';
+import { AuthModule } from './auth/auth.module';
+import { APP_GUARD } from '@nestjs/core';
+import { AuthGuard } from './common/guards/auth.guard';
+import { RolesGuard } from './common/guards/roles.guard';
 
 @Module({
   imports: [
@@ -26,6 +30,17 @@ import { CommentsModule } from './comments/comments.module';
     }),
     MoviesModule,
     CommentsModule,
+    AuthModule,
+  ],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: AuthGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: RolesGuard,
+    },
   ],
 })
 export class AppModule {}

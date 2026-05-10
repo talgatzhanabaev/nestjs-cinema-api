@@ -15,6 +15,8 @@ import { UpdateTicketDto } from './dto/update-ticket.dto';
 import { Ticket } from '../generated/prisma/client';
 import { UsersService } from '../users/users.service';
 import { HallsService } from '../halls/halls.service';
+import { Roles } from '../common/decorators/roles.decorator';
+import { Role } from '../common/enums/role.enum';
 
 @Controller('tickets')
 export class TicketsController {
@@ -25,6 +27,7 @@ export class TicketsController {
   ) {}
 
   @Post()
+  @Roles(Role.User)
   create(@Body() createTicketDto: CreateTicketDto): Promise<Ticket> {
     const { price, seat, movieId, movieTitle, startTime, userId, hallId } =
       createTicketDto;
@@ -55,16 +58,19 @@ export class TicketsController {
   }
 
   @Get()
+  @Roles(Role.Admin)
   findAll(): Promise<Ticket[]> {
     return this.ticketsService.findAll();
   }
 
   @Get(':id')
+  @Roles(Role.Admin)
   findOne(@Param('id', ParseIntPipe) id: number): Promise<Ticket | null> {
     return this.ticketsService.findOne({ id });
   }
 
   @Patch(':id')
+  @Roles(Role.Admin)
   update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateTicketDto: UpdateTicketDto,
@@ -73,6 +79,7 @@ export class TicketsController {
   }
 
   @Delete(':id')
+  @Roles(Role.Admin)
   remove(@Param('id', ParseIntPipe) id: number): Promise<Ticket> {
     return this.ticketsService.remove({ id });
   }
