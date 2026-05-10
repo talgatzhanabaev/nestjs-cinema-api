@@ -25,7 +25,7 @@ import { RolesGuard } from './common/guards/roles.guard';
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
-        uri: configService.get<string>('MONGODB_URI'),
+        uri: configService.get('MONGODB_URI'),
       }),
     }),
     MoviesModule,

@@ -1,4 +1,15 @@
 services:
+  api:
+    build: .
+    container_name: cinema_api
+    restart: always
+    ports:
+      - '3000:3000'
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+    depends_on:
+      - postgresql
+      - mongodb
   postgresql:
     image: postgres:16
     container_name: cinema_postgres
