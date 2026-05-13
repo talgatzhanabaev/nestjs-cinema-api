@@ -1,0 +1,43 @@
+<div id='movieModal-{{index}}' style='display: none;'>
+  <div class='modal-content'>
+    <button
+      type='button'
+      onclick="closeModal('movieModal-{{index}}')"
+    >X</button>
+    <h2>{{movieData.title}}</h2>
+    <p><strong>Описание:</strong> {{movieData.description}}</p>
+    <p><strong>Зал:</strong> {{movieData.hallId}}</p>
+    <p><strong>Сеанс:</strong> {{movieData.seance}}</p>
+    <h3>Создатели и актеры</h3>
+    <p><strong>Режиссеры:</strong>
+      {{#each movieData.producers}}{{this}}{{#unless @last}},
+        {{/unless}}{{/each}}
+    </p>
+    <p><strong>Жанры:</strong>
+      {{#each movieData.genres}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}
+    </p>
+    <p><strong>Актеры:</strong>
+      {{#each movieData.actors}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}
+    </p>
+    <h3>Комментарии</h3>
+    <div id='comments-container-{{movieId}}' class='comments-list'>
+      Загрузка комментариев...
+    </div>
+    <form onsubmit="handleCommentSubmit(event, '{{{movieId}}}')">
+      <label>Ваш комментарий:
+
+        <textarea
+          id='comment-text-{{movieId}}'
+          name='text'
+          rows='4'
+          cols='50'
+          required
+        ></textarea>
+      </label>
+
+      <button type='submit' class='auth-required-btn'>Отправить</button>
+      <p class='auth-warning' style='color: gray; display: none;'>Войдите, чтобы
+        оставить комментарий.</p>
+    </form>
+  </div>
+</div>
