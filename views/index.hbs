@@ -1,0 +1,156 @@
+<html lang='en'>
+<head>
+  <link rel='stylesheet' href='css/style.css' />
+  <meta charset='UTF-8' />
+  <meta name='viewport' content='width=device-width, initial-scale=1.0' />
+  <title>Movies</title>
+</head>
+<body>
+<main>
+  <header>
+  <div id="guest-actions">
+      <button type="button" onclick="openModal('registerModal')">Регистрация</button>
+      <button type="button" onclick="openModal('loginModal')">Авторизация</button>
+  </div>
+  </header>
+
+  <h1>Список фильмов</h1>
+  <div class="movies-grid">
+  {{#each movies}}
+    <button type="button" class="movie-card-btn" onclick="openMovieTemplate('movieModal-{{@index}}', '{{{this._id}}}')">
+      <h2>{{this.title}}</h2>
+      <p>{{this.description}}</p>
+      <p><strong>Сеанс:</strong> {{this.seance}}</p>
+    </button>
+    {{> movie movieData=this index=@index movieId=this._id}}
+  {{/each}}
+</div>
+
+</main>
+{{> register}}
+{{> login}}
+<script>
+function checkAuthStatus() {
+  const token = localStorage.getItem('jwt_token');
+  const guestActions = document.getElementById('guest-actions');
+  const userActions = document.getElementById('user-actions');
+  const authButtons = document.querySelectorAll('.auth-required-btn');
+  const authWarnings = document.querySelectorAll('.auth-warning');
+  if (token) {
+    guestActions.style.display = 'none';
+    userActions.style.display = 'block';
+    authButtons.forEach(btn => btn.style.display = 'block');
+    authWarnings.forEach(p => p.style.display = 'none');
+    const username = localStorage.getItem('username') || 'Пользователь';
+    document.getElementById('user-greeting').innerText = `Привет, ${username}! `;
+  } else {
+    guestActions.style.display = 'block';
+    userActions.style.display = 'none';
+    authButtons.forEach(btn => btn.style.display = 'none');
+    authWarnings.forEach(p => p.style.display = 'block');
+  }
+}
+async function handleLogin(event) {
+  event.preventDefault();
+  const email = document.getElementById('login-email').value;
+  const password = document.getElementById('login-password').value;
+  try {
+    const response = await fetch('/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
+    });
+    if (!response.ok) {
+      throw new Error('Неверный email или пароль');
+    }
+    const data = await response.json();
+    const token = data.access_token || data.token;
+    localStorage.setItem('jwt_token', token);
+    if (data.username) {
+      localStorage.setItem('username', data.username);
+    }
+    closeModal('loginModal');
+    checkAuthStatus();
+  } catch (error) {
+    alert(error.message);
+  }
+}
+function logout() {
+  localStorage.removeItem('jwt_token');
+  localStorage.removeItem('username');
+  checkAuthStatus();
+}
+async function handleCommentSubmit(event, movieId) {
+  event.preventDefault();
+  const token = localStorage.getItem('jwt_token');
+  const textarea = document.getElementById(`comment-text-${movieId}`);
+  const text = textarea.value;
+  if (!token) {
+    alert('Вы должны быть авторизованы!');
+    return;
+  }
+  try {
+    const response = await fetch(`/movies/${movieId}/comments`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({ text })
+    });
+    if (!response.ok) {
+      if (response.status === 419 || response.status === 401) {
+        logout();
+          throw new Error('Сессия истекла. Пожалуйста, авторизуйтесь снова.');
+        }
+      throw new Error('Не удалось отправить комментарий');
+    }
+    textarea.value = '';
+    await openMovieTemplate(`movieModal-${document.getElementById(`comments-container-${movieId}`).closest('[id^="movieModal-"]').id.split('-')[1]}`, movieId);
+  } catch (error) {
+    alert(error.message);
+  }
+}
+document.addEventListener('DOMContentLoaded', checkAuthStatus);
+function openModal(id) {
+  document.getElementById(id).style.display = 'block';
+}
+function closeModal(id)
+
+
+{
+  document.getElementById(id).style.display = 'none';
+}
+async function openMovieTemplate(modalId, movieId) {
+  document.getElementById(modalId).style.display = 'block';
+  const container = document.getElementById(`comments-container-${movieId}`);
+  if (!container) {
+    console.error(`Контейнер comments-container-${movieId} не найден на странице`);
+    return;
+  }
+  container.innerHTML = 'Загрузка комментариев...';
+  try {
+    const response = await fetch(`/movies/${movieId}/comments`);  
+    if (!response.ok) {
+      throw new Error(`Сервер ответил со статусом ${response.status}`);
+    }
+    const comments = await response.json(); 
+    container.innerHTML = '';
+    if (!comments || comments.length === 0) {
+      container.innerHTML = '<p>Комментариев пока нет. Будьте первым!</p>';
+      return;
+    }
+    comments.forEach(comment => {
+      const commentDiv = document.createElement('div');
+      commentDiv.className = 'comment-item';
+      commentDiv.innerHTML = `<p>${comment.text}</p>`;
+      container.appendChild(commentDiv);
+    });
+  } catch (error) {
+    console.error('Детали ошибки fetch:', error);
+    container.innerHTML = `<p style="color: red;">Не удалось загрузить комментарии. Ошибка: ${error.message}</p>`;
+  }
+}
+</script>
+</body>
+</html>

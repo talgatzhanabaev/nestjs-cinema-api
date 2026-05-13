@@ -1,0 +1,16 @@
+<div id='registerModal' style='display: none;'>
+  <div class='modal-content'>
+    <button type='button' onclick="closeModal('registerModal')">X</button>
+    <h2>Регистрация</h2>
+    <form action='/users' method='POST'>
+      <label>Имя: <input type='text' name='name' required /></label>
+
+      <label>Email: <input type='email' name='email' required /></label>
+
+      <label>Пароль:
+        <input type='password' name='password' required /></label>
+
+      <button type='submit'>Зарегистрироваться</button>
+    </form>
+  </div>
+</div>

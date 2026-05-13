@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  Render,
 } from '@nestjs/common';
 import { MoviesService } from './movies.service';
 import { CreateMovieDto } from './dto/create-movie.dto';
@@ -26,8 +27,10 @@ export class MoviesController {
 
   @Public()
   @Get()
-  findAll() {
-    return this.moviesService.findAll();
+  @Render('index')
+  async findAll() {
+    const movies = await this.moviesService.findAll();
+    return { movies };
   }
 
   @Public()
