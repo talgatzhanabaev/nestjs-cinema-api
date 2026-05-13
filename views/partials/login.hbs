@@ -1,0 +1,21 @@
+<div id='loginModal' style='display: none;'>
+  <div class='modal-content'>
+    <button type='button' onclick="closeModal('loginModal')">X</button>
+    <h2>Авторизация</h2>
+    <!-- Убрали action, добавили id и onSubmit -->
+    <form id='loginForm' onsubmit='handleLogin(event)'>
+      <label>Email:
+        <input type='email' name='email' id='login-email' required /></label>
+
+      <label>Пароль:
+        <input
+          type='password'
+          name='password'
+          id='login-password'
+          required
+        /></label>
+
+      <button type='submit'>Войти</button>
+    </form>
+  </div>
+</div>
